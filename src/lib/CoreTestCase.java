@@ -13,7 +13,11 @@ public class CoreTestCase extends TestCase{
   private static String AppiumUrl = "http://127.0.0.1:4723/wd/hub";
 
   @Override
+<<<<<<< HEAD
+  protected void setUp() throws Exception {
+=======
   public void setUp() throws Exception {
+>>>>>>> 9ffb5c085682fef9866d0996cdb31437b227ddf6
 
     super.setUp();
 
@@ -32,7 +36,11 @@ public class CoreTestCase extends TestCase{
   }
 
   @Override
+<<<<<<< HEAD
+  protected void tearDown() throws Exception{
+=======
   public void tearDown() throws Exception{
+>>>>>>> 9ffb5c085682fef9866d0996cdb31437b227ddf6
 
     driver.quit();
 
