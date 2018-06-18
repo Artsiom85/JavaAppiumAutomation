@@ -1,194 +1,83 @@
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
 import lib.CoreTestCase;
-import org.junit.After;
+import lib.ui.ArticlePageObject;
+import lib.ui.MainPageObject;
+import lib.ui.SearchPageObject;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.net.URL;
 
 public class SecondTest extends CoreTestCase {
+  private lib.ui.MainPageObject MainPageObject;
 
-  private AppiumDriver driver;
+  protected void setUp() throws Exception {
+    super.setUp();
 
-  @Before
-  public void setUp() throws Exception
-  {
-    DesiredCapabilities capabilities = new DesiredCapabilities();
-
-    capabilities.setCapability("platformName","Android");
-    capabilities.setCapability("deviceName","AndroidTestDevice");
-    capabilities.setCapability("platformVersion","6.0");
-    capabilities.setCapability("automationName","Appium");
-    capabilities.setCapability("appPackage","org.wikipedia");
-    capabilities.setCapability("appActivity",".main.MainActivity");
-    capabilities.setCapability("app","/Users/artsiomkaraliou/Documents/GitHub/JavaAppiumAutomation/apks/org.wikipedia.apk");
-
-  driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
-  }
-  @After
-  public void tearDown()
-  {
-    driver.quit();
+    MainPageObject = new MainPageObject(driver);
   }
 
+  @Test
+  public void testAvailabilityOfText() {
+    SearchPageObject SearchPageObject = new SearchPageObject(driver);
+
+    SearchPageObject.initSearchInput();
+    SearchPageObject.typeSearchLine("Python");
+    SearchPageObject.waitForSearchResult("General-purpose, high-level programming language");
+  }
 
 
   @Test
-  public void testAvailabilityOfText()
-  {
-    waitForElementAndClick(
-            By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
-            "Cannot find Search Wikipedia input",
-            5
-    );
-    waitForElementAndSendKeys(
-            By.xpath("//*[contains(@text, 'Search…')]"),
-            "Python",
-            "Cannot find search input",
-            5
-    );
+  public void testCancelSearch() {
+    SearchPageObject SearchPageObject = new SearchPageObject(driver);
 
-    waitForElementPresent(
-            By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='General-purpose, high-level programming language']"),
-            "Cannot find 'General-purpose, high-level programming language' topic searching by 'Python'",
-            15
-
-    );
+    SearchPageObject.initSearchInput();
+    SearchPageObject.typeSearchLine("Python");
+    SearchPageObject.checkSearchResultsListForFewArticles();
+    SearchPageObject.waitForCancelButtonToAppear();
+    SearchPageObject.clickCancelSearch();
+    SearchPageObject.checkSearchResultsListIsNotPresent();
 
   }
 
   @Test
-  public void testCancelSearch ()
-  {
-    waitForElementAndClick(
-            By.id("org.wikipedia:id/search_container"),
-            "Cannot find 'Search Wikipedia' input",
-            5
+  public void testCancelSearch2() {
+    SearchPageObject searchPageObject = new SearchPageObject(driver);
 
-    );
-    waitForElementAndSendKeys(
-            By.xpath("//*[contains(@text, 'Search…')]"),
-            "Python",
-            "Cannot find search input",
-            5
-    );
-    waitForElementAndClear(
-            By.id("org.wikipedia:id/search_src_text"),
-            "Cannot find search field",
-            5
-    );
-
-    //Проверяем, что результатов поиска несколько ( >=2):
-            checkForFewSearchResultsArePresented();
-
-    waitForElementAndClick(
-            By.id("org.wikipedia:id/search_close_btn"),
-            "Cannot find X to cancel search",
-            5
-
-    );
-    waitForElementNotPresent(
-            By.id("org.wikipedia:id/search_close_btn"),
-            "X is still present on the page",
-            5
-    );
-
+    searchPageObject.initSearchInput();
+    searchPageObject.typeSearchLine("Java");
+    searchPageObject.waitForCancelButtonToAppear();
+    searchPageObject.clickCancelSearch();
+    searchPageObject.clickCancelSearch();
+    searchPageObject.waitForCancelButtonToDissappear();
   }
 
-
-
   @Test
-  public void testCompareWordsInSearch()
-  {
-    waitForElementAndClick(
-            By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
-            "Cannot find 'Search Wikipedia' input",
-            5
-    );
-    waitForElementAndSendKeys(
-            By.xpath("//*[contains(@text, 'Search…')]"),
-            "Python",
-            "Cannot find search input",
-            5
-    );
-    waitForElementAndClick(
-            By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='General-purpose, high-level programming language']"),
-            "Cannot find 'Search Wikipedia' input",
-            5
-    );
+  public void testCompareArticleTitle() {
+    SearchPageObject searchPageObject = new SearchPageObject(driver);
 
-    WebElement title_element = waitForElementPresent(
-            By.id("org.wikipedia:id/view_page_title_text"),
-            "cannot find article title",
-            15
+    searchPageObject.initSearchInput();
+    searchPageObject.typeSearchLine("Python");
+    searchPageObject.clickByArticleWithSubstring("General-purpose, high-level programming language");
 
-    );
-
-    String article_title = title_element.getAttribute("text");
+    ArticlePageObject ArticlePageObject = new ArticlePageObject(driver);
+    String article_title = ArticlePageObject.getArticleTitle();
 
     Assert.assertEquals(
-            "We see unexpected title",
+            "We see unexpected title!",
             "Python (programming language)",
             article_title
     );
-
-
-
-
-  }
-  private WebElement waitForElementPresent(By by, String error_message, long timeoutInSeconds)
-  {
-    WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
-    wait.withMessage(error_message + "\n");
-    return wait.until(
-            ExpectedConditions.presenceOfElementLocated(by)
-    );
   }
 
-  private WebElement waitForElementPresent(By by, String error_message)
-  {
-    return waitForElementPresent(by, error_message, 5);
-  }
+  @Test
+  public void testSwipeArticle() {
 
-  private WebElement waitForElementAndClick(By by, String error_message, long timeoutInSeconds)
-  {
-    WebElement element =  waitForElementPresent(by, error_message, 5);
-    element.click();
-    return element;
-  }
-  private WebElement waitForElementAndSendKeys(By by, String value, String error_message, long timeoutInSeconds)
-  {
-    WebElement element =  waitForElementPresent(by, error_message, 5);
-    element.sendKeys(value);
-    return element;
-  }
+    SearchPageObject searchPageObject = new SearchPageObject(driver);
+    searchPageObject.initSearchInput();
+    searchPageObject.typeSearchLine("Appium");
+    searchPageObject.clickByArticleWithSubstring("Appium");
 
-  private boolean waitForElementNotPresent(By by, String error_message, long timeoutInSeconds)
-  {
-    WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
-    wait.withMessage(error_message + "\n");
-    return wait.until(
-            ExpectedConditions.invisibilityOfElementLocated(by)
-    );
-  }
-
-  private WebElement waitForElementAndClear(By by, String error_message, long timeoutInSeconds)
-  {
-    WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
-    element.clear();
-    return element;
-  }
-  private void checkForFewSearchResultsArePresented() {
-    int numberOfSearchResults = driver.findElements(By.id("org.wikipedia:id/page_list_item_container")).size();
-    Assert.assertTrue("Number of search results is less than a few!", numberOfSearchResults >= 2);
-
+    ArticlePageObject ArticlePageObject = new ArticlePageObject(driver);
+    ArticlePageObject.waitForTitleElement();
+    ArticlePageObject.swipeArticleToFooter();
   }
 }
 
