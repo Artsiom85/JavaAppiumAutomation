@@ -83,7 +83,7 @@ public class SearchPageObject extends MainPageObject {
   //The method of clicking on an element with a locator with the specified name and substring
   public void waitForElementByTitleAndDescription(String title, String substring) {
     this.waitForElementPresent(By.xpath(getResultSearchElementByTitleAndSubstring(title, substring)),
-            "Can't find search result with title " + title + "\" and substring \"" + substring + "\"!",
-            +10);
+            "Cannot find search result with title \"" + title + "\" and substring \"" + substring + "\"!",
+            10);
   }
 }
