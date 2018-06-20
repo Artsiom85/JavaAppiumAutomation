@@ -11,10 +11,17 @@ public class SearchPageObject extends MainPageObject {
           SEARCH_INPUT = "//*[contains(@text, 'Search…')]",
           SEARCH_RESULT_BY_SUBSTRING_TPL = "//*[@resource-id = 'org.wikipedia:id/page_list_item_container']//*[@text = '{SUBSTRING}']",
           SEARCH_CANCEL_BUTTON = "org.wikipedia:id/search_close_btn",
-          SEARCH_RESULT_ELEMENT = "//*[@resource-id='org.wikipedia:id/search_results_list']/*{@resource-id='org.wikipedia:id/page_list_item_container']";
+          SEARCH_RESULT_ELEMENT = "//*[@resource-id='org.wikipedia:id/search_results_list']/*{@resource-id='org.wikipedia:id/page_list_item_container']",
+  //A locator template that finds the result of the search simultaneously by the title and description
+          SEARCH_RESULT_BY_TITLE_AND_SUBSTRING_TPL = "//*[android.widget.TextView[@index=0 and @text='{TITLE}'] and android.widget.TextView[@index=1 and @text='{SUBSTRING}']]";
 
   public SearchPageObject(AppiumDriver driver) {
     super(driver);
+  }
+
+  //The method for substitution into the template
+  private static String getResultSearchElementByTitleAndSubstring(String title, String substring) {
+    return SEARCH_RESULT_BY_TITLE_AND_SUBSTRING_TPL.replace("{TITLE}", title).replace("{SUBSTRING}", substring);
   }
 
   //initialize Template method
@@ -71,5 +78,12 @@ public class SearchPageObject extends MainPageObject {
   public void checkSearchResultsListIsNotPresent() {
 
     this.checkForSearchResultAreEmpty();
+  }
+
+  //The method of clicking on an element with a locator with the specified name and substring
+  public void waitForElementByTitleAndDescription(String title, String substring) {
+    this.waitForElementPresent(By.xpath(getResultSearchElementByTitleAndSubstring(title, substring)),
+            "Can't find search result with title " + title + "\" and substring \"" + substring + "\"!",
+            +10);
   }
 }
