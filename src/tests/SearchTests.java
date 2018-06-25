@@ -2,6 +2,7 @@ package tests;
 
 import lib.CoreTestCase;
 import lib.ui.ArticlePageObject;
+import lib.ui.MainPageObject;
 import lib.ui.SearchPageObject;
 import lib.ui.factories.ArticlePageObjectFactory;
 import lib.ui.factories.SearchPageObjectFactory;
@@ -78,5 +79,16 @@ public class SearchTests extends CoreTestCase {
     SearchPageObject.waitForElementByTitleAndDescription("Java", "Island of Indonesia");
     SearchPageObject.waitForElementByTitleAndDescription("Java (programming language)", "Object-oriented programming language");
     SearchPageObject.waitForElementByTitleAndDescription("JavaScript", "Programming language");
+  }
+
+  @Test
+  public void testFindArticleByTitleAndSubstringIOS_ex11() throws InterruptedException{
+    SearchPageObject searchPageObject = SearchPageObjectFactory.get(driver);
+    MainPageObject MainPageObject = new MainPageObject(driver);
+    searchPageObject.initSearchInput();
+    searchPageObject.typeSearchLine("Java");
+    searchPageObject.waitForElementByTitleAndDescription("Java", "Island of Indonesia");
+    searchPageObject.waitForElementByTitleAndDescription("Java (programming language)", "Object-oriented programming language");
+    searchPageObject.waitForElementByTitleAndDescription("JavaScript", "Programming language");
   }
 }
