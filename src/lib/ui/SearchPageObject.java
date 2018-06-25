@@ -3,15 +3,20 @@ package lib.ui;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
 
+import java.util.regex.Pattern;
+
 abstract public class SearchPageObject extends MainPageObject {
 
-   protected static String
+  protected static String
 
           SEARCH_INIT_ELEMENT,
           SEARCH_INPUT,
           SEARCH_RESULT_BY_SUBSTRING_TPL,
           SEARCH_CANCEL_BUTTON,
           SEARCH_RESULT_ELEMENT,
+          SEARCH_EMPTY_RESULT_ELEMENT,
+          SEARCH_INPUT_WITH_TEXT,
+          CLEAR_SEARCH_INPUT_BTN,
           SEARCH_RESULT_BY_TITLE_AND_SUBSTRING_TPL;
 
   public SearchPageObject(AppiumDriver driver) {
@@ -74,15 +79,37 @@ abstract public class SearchPageObject extends MainPageObject {
     this.checkForFewSearchResultsArePresented();
   }
 
-  public void checkSearchResultsListIsNotPresent() {
-
-    this.checkForSearchResultAreEmpty();
-  }
-
   //The method of clicking on an element with a locator with the specified name and substring
   public void waitForElementByTitleAndDescription(String title, String substring) {
     this.waitForElementPresent(getResultSearchElementByTitleAndSubstring(title, substring),
             "Cannot find search result with title \"" + title + "\" and substring \"" + substring + "\"!",
             10);
   }
+
+  public void checkSearchResultsListIsNotPresent() {
+
+    this.checkForSearchResultAreEmpty();
+  }
+
+  public void clearSearchInput() {
+    this.waitForElementAndClear(
+            SEARCH_INPUT_WITH_TEXT,
+            "Cannot clear search button",
+            5
+    );
+  }
+
+  public void clickCLearSearchInputButton() {
+    this.waitForElementAndClick(
+            CLEAR_SEARCH_INPUT_BTN,
+            "Cannot click on clear search field button!",
+            10
+    );
+  }
+
+  public String[] splitIOSArticleNameIntoTitleAndSubstring(String article_name) {
+    String[] explored_name = article_name.split(Pattern.quote("\n"), 2);
+    return explored_name;
+  }
 }
+
